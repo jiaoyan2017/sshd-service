@@ -1,0 +1,14 @@
+FROM ubuntu:22.04
+
+# Install tools
+RUN apt-get update \
+  && apt-get -y install curl vim
+
+# Install sshd service
+RUN apt-get update \
+  && echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d \
+  && DEBIAN_FRONTEND="noninteractive" apt-get install -y openssh-server \
+  && rm -rf /var/lib/apt/lists/*
+
+CMD     ["/usr/sbin/sshd", "-D"]
+

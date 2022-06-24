@@ -1,0 +1,20 @@
+FROM ubuntu:20.04
+MAINTAINER yan.jiao@thistech.com
+
+RUN     apt-get update \
+        && echo "#!/bin/sh\nexit 0" > /usr/sbin/policy-rc.d \
+        && DEBIAN_FRONTEND="noninteractive" apt-get install -y openssh-server \
+        && rm -rf /var/lib/apt/lists/*
+
+# Set root password
+RUN     echo 'root:thistech'|chpasswd
+RUN     mkdir -p /var/run/sshd  # Not necessary. Should be removed.
+
+# Permit root to login
+RUN     echo 'PermitRootLogin yes' >> /etc/ssh/sshd_config \
+  &&    echo 'PasswordAuthentication yes' >> /etc/ssh/sshd_config \
+  &&    echo 'KbdInteractiveAuthentication no' >> /etc/ssh/sshd_config  # Default in Ubuntu 22.04 and it's required for root login
+
+#EXPOSE  2222
+CMD     ["/usr/sbin/sshd", "-D"]
+
